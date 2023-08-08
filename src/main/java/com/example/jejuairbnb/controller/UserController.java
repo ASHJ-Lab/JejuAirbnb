@@ -7,6 +7,8 @@ import com.example.jejuairbnb.domain.User;
 import com.example.jejuairbnb.services.UserService;
 import com.example.jejuairbnb.shared.services.SecurityService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +34,15 @@ public class UserController {
 
     @GetMapping("/my_info")
     public MyInfoUserResponseDto getMyInfo(
-            @CookieValue("access-token") String accessToken
+            HttpServletRequest request
     ) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new RuntimeException("쿠키가 없습니다.");
+        }
+
+        String accessToken = securityService.getTokenByCookie(cookies);
+
         User findUser = securityService.getSubject(accessToken);
         return userService.getMyInfo(
                 findUser
