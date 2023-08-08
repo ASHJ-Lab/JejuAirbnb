@@ -36,38 +36,54 @@ public class ReservationService {
         String checkOut = createReservationRequestDto.getCheckOut();
         Long productId = createReservationRequestDto.getProductId();
 
-        Product product = productRepository.findById(productId)
+        Product foundProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new HttpException(
                         false,
                         "해당 상품이 존재하지 않습니다.",
                         HttpStatus.NOT_FOUND
                 ));
-
-        Reservation newReservation = Reservation
-                .builder()
-                .checkIn(checkIn)
-                .checkOut(checkOut)
-                .product(product)
-                .userId(user.getId())
-                .build();
-
-        Reservation savedReservation = reservationRepository.save(newReservation);
-
-        Product findProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new HttpException(
-                        false,
-                        "해당 상품이 존재하지 않습니다.",
-                        HttpStatus.NOT_FOUND
-                ));
-        int price = findProduct.getPrice();
-        int totalPrice;
-
+        // checkIn 과 checkOut 을 LocalDate 로 변환해준다.
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate checkInDate = LocalDate.parse(checkIn,formatter);
         LocalDate checkOutDate = LocalDate.parse(checkOut,formatter);
 
+        // foundProduct 에서 checkIn 과 checkOut 을 가져온다.
+        for (Reservation reservation: foundProduct.getReservations()) {
+            String checkInFromReservation = reservation.getCheckIn();
+            String checkOutFromReservation = reservation.getCheckOut();
+
+            LocalDate checkInDateFromReservation = LocalDate.parse(checkInFromReservation, formatter);
+            LocalDate checkOutDateFromReservation = LocalDate.parse(checkOutFromReservation, formatter);
+
+            System.out.println(reservation);
+
+            // 포함 관계 확인
+            if (!checkOutDate.isBefore(checkInDateFromReservation) &&
+                    !checkInDate.isAfter(checkOutDateFromReservation)) {
+                throw new HttpException(
+                        false,
+                        "예약이 불가능한 날짜입니다.",
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+        }
+
+        Reservation savedReservation = reservationRepository.save(
+                Reservation
+                        .builder()
+                        .checkIn(checkIn)
+                        .checkOut(checkOut)
+                        .product(foundProduct)
+                        .userId(user.getId())
+                        .build()
+        );
+
+        int price = foundProduct.getPrice();
+        // ChronoUnit.DAYS: 일(day) 단위로 시간을 계산하기 위한 열거형 상수이다.
+        // between(checkInDate, checkOutDate): 두 LocalDate 객체 사이의 차이를 계산
+        // checkInDate가 "2023-08-01"이고 checkOutDate가 "2023-08-04"라면 daysBetween에는 3
         long daysBetween = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
-        totalPrice = (int)daysBetween * price;
+        int totalPrice = (int)daysBetween * price;
 
         return new CreateReservationResponseDto(
                 savedReservation.getProduct().getId(),
