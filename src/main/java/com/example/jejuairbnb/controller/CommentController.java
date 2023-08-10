@@ -10,7 +10,14 @@ import com.example.jejuairbnb.shared.services.SecurityService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentOneResponseDto;
+import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentResponseDto;
+import com.example.jejuairbnb.services.CommentService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,11 +47,30 @@ public class CommentController {
         );
     }
 
+    @GetMapping()
+    public FindCommentResponseDto getComments (
+                @RequestParam(defaultValue = "1") Integer page,
+                @RequestParam(defaultValue = "10") Integer size
+    ) {
+        if (page < 1) {
+            page = 1;
+        }
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return commentService.findComment(pageable);
+    }
+
+    @GetMapping("/{id}")
+    public FindCommentOneResponseDto findCommentOne (
+            @Parameter(description = "코멘트 id", required = true) Long id
+    ){
+        return commentService.findCommentOneById(id);
+    }
+
     @PutMapping("/{id}")
-    public CoreSuccessResponseWithData updateComment(
+    public CoreSuccessResponseWithData updateComment (
             @PathVariable Long id,
             @RequestBody UpdateCommentRequestDto requestDto
-    ) {
+    ){
         return commentService.updateComment(
                 id,
                 requestDto
@@ -52,9 +78,9 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public CoreSuccessResponse deleteComment(
+    public CoreSuccessResponse deleteComment (
             @PathVariable Long id
-    ) {
+    ){
         return commentService.deleteComment(id);
     }
 }

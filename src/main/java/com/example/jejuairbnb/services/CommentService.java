@@ -25,7 +25,6 @@ import java.util.List;
 public class CommentService {
 
     private final ICommentRepository commentRepository;
-    private final IProductRepository productRepository;
 
     public CoreSuccessResponseWithData createComment(
             User user,
@@ -108,7 +107,6 @@ public class CommentService {
     }
 
     public FindCommentResponseDto findComment(
-            Long productId,
             Pageable pageable
     ) {
         try {
