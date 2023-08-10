@@ -22,36 +22,6 @@ public class CommentService {
 
     private final ICommentRepository commentRepository;
 
-    public CoreSuccessResponseWithData createComment(
-            User user,
-            CreateCommentRequestDto requestDto
-    ) {
-        try {
-            Comment comment = Comment
-                    .builder()
-                    .rating(requestDto.getRating())
-                    .description(requestDto.getDescription())
-                    .img(requestDto.getImg())
-                    .user(user)
-                    .build();
-
-            commentRepository.save(comment);
-
-            return new CoreSuccessResponseWithData(
-                    true,
-                    "댓글이 성공적으로 등록되었습니다.",
-                    201,
-                    comment
-            );
-        } catch (Exception e) {
-            throw new HttpException(
-                    false,
-                    "에러가 발생했습니다.",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-    }
-
     public FindCommentOneResponseDto findCommentOneById(
             Long id
     ) {

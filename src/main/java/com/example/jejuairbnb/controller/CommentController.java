@@ -1,16 +1,13 @@
 package com.example.jejuairbnb.controller;
 
-import com.example.jejuairbnb.adminController.AdminCommentDto.CreateCommentDto.CreateCommentRequestDto;
-import com.example.jejuairbnb.controller.UserControllerDto.CreateUserDto.CreateUserRequestDto;
-import com.example.jejuairbnb.controller.UserControllerDto.CreateUserDto.CreateUserResponseDto;
-import com.example.jejuairbnb.domain.User;
+import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentOneResponseDto;
+import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentResponseDto;
 import com.example.jejuairbnb.services.CommentService;
-import com.example.jejuairbnb.services.UserService;
-import com.example.jejuairbnb.shared.response.CoreSuccessResponseWithData;
-import com.example.jejuairbnb.shared.services.SecurityService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,17 +16,23 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/comments")
 public class CommentController {
     private final CommentService commentService;
-    private final SecurityService securityService;
 
-    @PostMapping("/kakao_login")
-    public CoreSuccessResponseWithData createComment(
-            @RequestBody CreateCommentRequestDto requestDto,
-            @CookieValue("access-token") String accessToken
+    @GetMapping()
+    public FindCommentResponseDto getComments(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size
     ) {
-        User findUser = securityService.getSubject(accessToken);
-        return commentService.createComment(
-                findUser,
-                requestDto
-        );
+        if (page < 1) {
+            page = 1;
+        }
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return commentService.findComment(pageable);
+    }
+
+    @GetMapping("/{id}")
+    public FindCommentOneResponseDto findCommentOne(
+            @Parameter(description = "코멘트 id", required = true) Long id
+    ) {
+        return commentService.findCommentOneById(id);
     }
 }
