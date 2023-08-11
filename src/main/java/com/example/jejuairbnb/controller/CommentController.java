@@ -1,8 +1,10 @@
 package com.example.jejuairbnb.controller;
 
 import com.example.jejuairbnb.adminController.AdminCommentDto.CreateCommentDto.CreateCommentRequestDto;
+import com.example.jejuairbnb.controller.CommentControllerDto.UpdateCommentRequestDto;
 import com.example.jejuairbnb.domain.User;
 import com.example.jejuairbnb.services.CommentService;
+import com.example.jejuairbnb.shared.response.CoreSuccessResponse;
 import com.example.jejuairbnb.shared.response.CoreSuccessResponseWithData;
 import com.example.jejuairbnb.shared.services.SecurityService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,5 +38,23 @@ public class CommentController {
                 findUser,
                 requestDto
         );
+    }
+
+    @PutMapping("/{id}")
+    public CoreSuccessResponseWithData updateComment(
+            @PathVariable Long id,
+            @RequestBody UpdateCommentRequestDto requestDto
+    ) {
+        return commentService.updateComment(
+                id,
+                requestDto
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public CoreSuccessResponse deleteComment(
+            @PathVariable Long id
+    ) {
+        return commentService.deleteComment(id);
     }
 }
