@@ -7,6 +7,7 @@ import com.example.jejuairbnb.controller.CommentControllerDto.UpdateCommentReque
 import com.example.jejuairbnb.domain.Comment;
 import com.example.jejuairbnb.domain.User;
 import com.example.jejuairbnb.repository.ICommentRepository;
+import com.example.jejuairbnb.repository.IProductRepository;
 import com.example.jejuairbnb.shared.exception.HttpException;
 import com.example.jejuairbnb.shared.response.CoreSuccessResponse;
 import com.example.jejuairbnb.shared.response.CoreSuccessResponseWithData;
@@ -24,6 +25,7 @@ import java.util.List;
 public class CommentService {
 
     private final ICommentRepository commentRepository;
+    private final IProductRepository productRepository;
 
     public CoreSuccessResponseWithData createComment(
             User user,
@@ -106,6 +108,7 @@ public class CommentService {
     }
 
     public FindCommentResponseDto findComment(
+            Long productId,
             Pageable pageable
     ) {
         try {
