@@ -113,7 +113,7 @@ public class AdminProductService {
             );
         }
 
-        if (findProduct.getUserId() != user.getId()) {
+        if (!findProduct.getUserId().equals(user.getId()) || findProduct.getUserId() != user.getId()) {
             throw new HttpException(
                     false,
                     "해당 상품의 주인이 아닙니다.",
