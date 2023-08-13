@@ -40,6 +40,10 @@ public class Product extends TimeStamped {
 
     private Double commentAvg;
 
+    private Long reservationCount;
+
+    private Double commentMax;
+
     @Column(name = "user_id")
     private Long userId;
 

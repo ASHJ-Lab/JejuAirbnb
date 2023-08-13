@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IReservationRepository extends JpaRepository<Reservation, Long> {
+
+    Long countByProductId(Long productId);
 }

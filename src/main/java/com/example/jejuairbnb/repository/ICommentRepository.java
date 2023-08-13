@@ -20,4 +20,7 @@ public interface ICommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByProductId(Long productId);
 
     Long countByProductId(Long productId);
+
+    @Query("SELECT MAX(c.rating) FROM Comment c WHERE c.product.id = :productId")
+    Double maxByProductId(Long productId);
 }
