@@ -3,18 +3,17 @@ package com.example.jejuairbnb.services;
 import com.example.jejuairbnb.controller.ProductControllerDto.FindProductOneResponseDto;
 import com.example.jejuairbnb.domain.Comment;
 import com.example.jejuairbnb.domain.Product;
+import com.example.jejuairbnb.domain.Reservation;
 import com.example.jejuairbnb.repository.ICommentRepository;
 import com.example.jejuairbnb.repository.IProductRepository;
+import com.example.jejuairbnb.repository.IReservationRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,14 +27,16 @@ public class ProductServiceTest {
 
     @MockBean
     private ICommentRepository commentRepository;
-
+    @MockBean
+    private IReservationRepository reservationRepository;
     private ProductService productService;
 
     @BeforeEach
     public void setup() {
         productService = new ProductService(
                 productRepository,
-                commentRepository
+                commentRepository,
+                reservationRepository
         );
     }
 
@@ -155,5 +156,244 @@ public class ProductServiceTest {
         Assertions.assertEquals(3, result.getComments().size());
         Assertions.assertEquals("Test comment 2", result.getComments().get(1).getDescription());
         Assertions.assertEquals("Test comment 3", result.getComments().get(2).getDescription());
+    }
+
+    @Test
+    public void testSortProductbyMaxComment(){
+        // comment 최고 값을 기준으로, 상품을 정렬한다.
+        // given
+        long productId1 = 1L;
+        Product mockProduct1 = new Product();
+        mockProduct1.setId(productId1);
+        mockProduct1.setName("Test Product 1");
+        mockProduct1.setImg("Test Product image 1");
+        mockProduct1.setPrice(100);
+        mockProduct1.setCommentMax(1.2);
+
+        Comment mockComment1 = new Comment();
+        mockComment1.setId(1L);
+        mockComment1.setRating(1.1f);
+        mockComment1.setDescription("Test comment 1");
+        mockComment1.setProduct(mockProduct1);
+
+        Comment mockComment2 = new Comment();
+        mockComment2.setId(2L);
+        mockComment2.setRating(1.2f);
+        mockComment2.setDescription("Test comment 2");
+        mockComment2.setProduct(mockProduct1);
+
+        long productId2 = 2L;
+        Product mockProduct2 = new Product();
+        mockProduct2.setId(productId2);
+        mockProduct2.setName("Test Product 2");
+        mockProduct2.setImg("Test Product image 2");
+        mockProduct2.setPrice(100);
+        mockProduct2.setCommentMax(1.3);
+
+        Comment mockComment3 = new Comment();
+        mockComment3.setId(2L);
+        mockComment3.setRating(1.3f);
+        mockComment3.setDescription("Test comment 3");
+        mockComment3.setProduct(mockProduct2);
+
+        // commentCount 를 기준으로 오름차순 정렬
+        int page = 1;
+        int size = 2;
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("commentMax").ascending());
+
+        List<Product> mockProducts = Arrays.asList(
+                mockProduct2,
+                mockProduct1
+        );
+        Page<Product> productPage = new PageImpl<>(mockProducts);
+        Mockito.when(productRepository.findAll(pageable)).thenReturn(productPage);
+
+        // when
+        Page<Product> resultPage = productRepository.findAll(pageable);
+        List<Product> products = resultPage.getContent();
+
+        // then
+        Assertions.assertEquals(2, products.size());
+        Assertions.assertEquals(mockProduct2, products.get(0));
+        Assertions.assertEquals(mockProduct1, products.get(1));
+    }
+
+    @Test
+    public void testSortProductbyAverageComment(){
+        // comment 평균 값을 기준으로, 상품을 정렬한다.
+        // given
+        long productId1 = 1L;
+        Product mockProduct1 = new Product();
+        mockProduct1.setId(productId1);
+        mockProduct1.setName("Test Product 1");
+        mockProduct1.setImg("Test Product image 1");
+        mockProduct1.setPrice(100);
+        mockProduct1.setCommentAvg(1.15);
+
+        Comment mockComment1 = new Comment();
+        mockComment1.setId(1L);
+        mockComment1.setRating(1.1f);
+        mockComment1.setDescription("Test comment 1");
+        mockComment1.setProduct(mockProduct1);
+
+        Comment mockComment2 = new Comment();
+        mockComment2.setId(2L);
+        mockComment2.setRating(1.2f);
+        mockComment2.setDescription("Test comment 2");
+        mockComment2.setProduct(mockProduct1);
+
+        long productId2 = 2L;
+        Product mockProduct2 = new Product();
+        mockProduct2.setId(productId2);
+        mockProduct2.setName("Test Product 2");
+        mockProduct2.setImg("Test Product image 2");
+        mockProduct2.setPrice(100);
+        mockProduct2.setCommentAvg(1.3);
+
+        Comment mockComment3 = new Comment();
+        mockComment3.setId(2L);
+        mockComment3.setRating(1.3f);
+        mockComment3.setDescription("Test comment 3");
+        mockComment3.setProduct(mockProduct2);
+
+        //commentCount 를 기준으로 오름차순 정렬
+        int page = 1;
+        int size = 2;
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("commentAvg").ascending());
+        List<Product> mockProducts = Arrays.asList(
+                mockProduct2,
+                mockProduct1
+        );
+        Page<Product> productPage = new PageImpl<>(mockProducts);
+        Mockito.when(productRepository.findAll(pageable)).thenReturn(productPage);
+
+        // when
+        Page<Product> resultPage = productRepository.findAll(pageable);
+        List<Product> products = resultPage.getContent();
+
+        // then
+        Assertions.assertEquals(2, products.size());
+        Assertions.assertEquals(mockProduct2, products.get(0));
+        Assertions.assertEquals(mockProduct1, products.get(1));
+
+    }@Test
+    public void testSortProductbyMostComment(){
+        // comment 수를 기준으로, 상품을 정렬한다.
+        // given
+        long productId1 = 1L;
+        Product mockProduct1 = new Product();
+        mockProduct1.setId(productId1);
+        mockProduct1.setName("Test Product 1");
+        mockProduct1.setImg("Test Product image 1");
+        mockProduct1.setPrice(100);
+        mockProduct1.setCommentCount(2L);
+
+        Comment mockComment1 = new Comment();
+        mockComment1.setId(1L);
+        mockComment1.setRating(1.1f);
+        mockComment1.setDescription("Test comment 1");
+        mockComment1.setProduct(mockProduct1);
+
+        Comment mockComment2 = new Comment();
+        mockComment2.setId(2L);
+        mockComment2.setRating(1.2f);
+        mockComment2.setDescription("Test comment 2");
+        mockComment2.setProduct(mockProduct1);
+
+        long productId2 = 2L;
+        Product mockProduct2 = new Product();
+        mockProduct2.setId(productId2);
+        mockProduct2.setName("Test Product 2");
+        mockProduct2.setImg("Test Product image 2");
+        mockProduct2.setPrice(100);
+        mockProduct2.setCommentCount(1L);
+
+        Comment mockComment3 = new Comment();
+        mockComment3.setId(2L);
+        mockComment3.setRating(1.3f);
+        mockComment3.setDescription("Test comment 3");
+        mockComment3.setProduct(mockProduct2);
+
+        //commentCount 를 기준으로 오름차순 정렬
+        int page = 1;
+        int size = 2;
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("commentCount").ascending());
+        List<Product> mockProducts = Arrays.asList(
+                mockProduct1,
+                mockProduct2
+        );
+        Page<Product> productPage = new PageImpl<>(mockProducts);
+        Mockito.when(productRepository.findAll(pageable)).thenReturn(productPage);
+
+        // When
+        Page<Product> resultPage = productRepository.findAll(pageable);
+        List<Product> products = resultPage.getContent();
+
+        // then
+        Assertions.assertEquals(2, products.size());
+        Assertions.assertEquals(mockProduct1, products.get(0));
+        Assertions.assertEquals(mockProduct2, products.get(1));
+    }
+
+    @Test
+    public void testSortProductMostReserved(){
+        //reservation 수가 많은 순으로, 상품을 정렬한다.
+        // given
+        long productId1 = 1L;
+        Product mockProduct1 = new Product();
+        mockProduct1.setId(productId1);
+        mockProduct1.setName("Test Product 1");
+        mockProduct1.setImg("Test Product image 1");
+        mockProduct1.setPrice(100);
+        mockProduct1.setReservationCount(2L);
+
+        Reservation reservation1 = new Reservation();
+        reservation1.setId(1L);
+        reservation1.setCheckIn("Test CheckIn 1");
+        reservation1.setCheckOut("Test CheckOut 1");
+        reservation1.setProduct(mockProduct1);
+        reservation1.setUserId(1L);
+
+        Reservation reservation2 = new Reservation();
+        reservation2.setId(2L);
+        reservation2.setCheckIn("Test CheckIn 2");
+        reservation2.setCheckOut("Test CheckOut 2");
+        reservation2.setProduct(mockProduct1);
+        reservation2.setUserId(1L);
+
+        long productId2 = 2L;
+        Product mockProduct2 = new Product();
+        mockProduct2.setId(productId2);
+        mockProduct2.setName("Test Product 2");
+        mockProduct2.setImg("Test Product image 2");
+        mockProduct2.setPrice(100);
+        mockProduct2.setReservationCount(1L);
+
+        Reservation reservation3 = new Reservation();
+        reservation3.setId(3L);
+        reservation3.setCheckIn("Test CheckIn 3");
+        reservation3.setCheckOut("Test CheckOut 3");
+        reservation3.setProduct(mockProduct2);
+        reservation3.setUserId(1L);
+
+        //reservationCount 를 기준으로 오름차순 정렬
+        int page = 1;
+        int size = 2;
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("reservationCount").ascending());
+        List<Product> mockProducts = Arrays.asList(
+                mockProduct1,
+                mockProduct2
+        );
+        Page<Product> productPage = new PageImpl<>(mockProducts);
+        Mockito.when(productRepository.findAll(pageable)).thenReturn(productPage);
+
+        // When
+        Page<Product> resultPage = productRepository.findAll(pageable);
+        List<Product> products = resultPage.getContent();
+
+        // then
+        Assertions.assertEquals(2, products.size());
+        Assertions.assertEquals(mockProduct1, products.get(0));
+        Assertions.assertEquals(mockProduct2, products.get(1));
     }
 }
