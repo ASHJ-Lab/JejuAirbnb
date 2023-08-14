@@ -1,5 +1,6 @@
 package com.example.jejuairbnb.controller;
 
+
 import com.example.jejuairbnb.adminController.AdminCommentDto.CreateCommentDto.CreateCommentRequestDto;
 import com.example.jejuairbnb.controller.CommentControllerDto.UpdateCommentRequestDto;
 import com.example.jejuairbnb.domain.User;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/comments")
 public class CommentController {
     private final CommentService commentService;
-    private final SecurityService securityService;
+
 
     @PostMapping("")
     public CoreSuccessResponseWithData createComment(
@@ -38,6 +41,7 @@ public class CommentController {
                 findUser,
                 requestDto
         );
+
     }
 
     @PutMapping("/{id}")
