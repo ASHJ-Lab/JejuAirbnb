@@ -9,6 +9,7 @@ import com.example.jejuairbnb.domain.Reservation;
 import com.example.jejuairbnb.domain.User;
 import com.example.jejuairbnb.repository.ICommentRepository;
 import com.example.jejuairbnb.repository.IProductRepository;
+import com.example.jejuairbnb.repository.IReservationRepository;
 import com.example.jejuairbnb.shared.Enum.ProviderEnum;
 import com.example.jejuairbnb.shared.exception.HttpException;
 import com.example.jejuairbnb.shared.response.CoreSuccessResponseWithData;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final IProductRepository productRepository;
     private final ICommentRepository commentRepository;
+    private final IReservationRepository reservationRepository;
 
     public FindProductOneResponseDto findProductOneById(
             Long id
@@ -42,9 +44,13 @@ public class ProductService {
                 ));
         Long commentCount = commentRepository.countByProductId(id);
         Double commentAvg = commentRepository.avgByProductId(id);
+        Long reservationCount = reservationRepository.countByProductId(id);
+        Double commentMax = commentRepository.maxByProductId(id);
 
         findProduct.setCommentAvg(commentAvg);
         findProduct.setCommentCount(commentCount);
+        findProduct.setReservationCount(reservationCount);
+        findProduct.setCommentMax(commentMax);
 
         List<Comment> comments = commentRepository.findByProductId(id);
         List<Comment> commentDtos = toDtoList(comments);

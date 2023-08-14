@@ -1,18 +1,13 @@
 package com.example.jejuairbnb.controller;
 
 import com.example.jejuairbnb.controller.ProductControllerDto.FindProductOneResponseDto;
-import com.example.jejuairbnb.controller.ProductControllerDto.FindProductResponseDto;
 import com.example.jejuairbnb.services.ProductService;
 import com.example.jejuairbnb.shared.response.CoreSuccessResponseWithData;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "product", description = "상품 API")
@@ -35,8 +30,8 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public FindProductOneResponseDto findProductOne(
-            @Parameter(description = "상품 id", required = true) Long id
+            @PathVariable(name = "id") Long productId
     ) {
-        return productService.findProductOneById(id);
+        return productService.findProductOneById(productId);
     }
 }
