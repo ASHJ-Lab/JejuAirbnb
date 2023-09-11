@@ -1,24 +1,23 @@
 package com.example.jejuairbnb.controller;
 
 import com.example.jejuairbnb.adminController.AdminCommentDto.CreateCommentDto.CreateCommentRequestDto;
+import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentOneResponseDto;
+import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentResponseDto;
 import com.example.jejuairbnb.controller.CommentControllerDto.UpdateCommentRequestDto;
 import com.example.jejuairbnb.domain.User;
 import com.example.jejuairbnb.services.CommentService;
 import com.example.jejuairbnb.shared.response.CoreSuccessResponse;
 import com.example.jejuairbnb.shared.response.CoreSuccessResponseWithData;
 import com.example.jejuairbnb.shared.services.SecurityService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentOneResponseDto;
-import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentResponseDto;
-import com.example.jejuairbnb.services.CommentService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.awt.print.Pageable;
 
 @RestController
 @Tag(name = "comments", description = "댓글 API")
@@ -55,7 +54,7 @@ public class CommentController {
         if (page < 1) {
             page = 1;
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
+        PageRequest pageable = PageRequest.of(page - 1, size);
         return commentService.findComment(pageable);
     }
 

@@ -4,7 +4,6 @@ import com.example.jejuairbnb.controller.CommentControllerDto.FindCommentOneResp
 import com.example.jejuairbnb.domain.Comment;
 import com.example.jejuairbnb.domain.User;
 import com.example.jejuairbnb.repository.ICommentRepository;
-import com.example.jejuairbnb.repository.IProductRepository;
 import com.example.jejuairbnb.shared.Enum.ProviderEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,14 +26,12 @@ public class CommentServiceTest {
 
     @MockBean
     private ICommentRepository commentRepository;
-    private IProductRepository productRepository;
-
     private CommentService commentService;
 
 
     @BeforeEach
     public void setup() {
-        commentService = new CommentService(commentRepository,productRepository);
+        commentService = new CommentService(commentRepository);
     }
 
     @Test
