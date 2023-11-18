@@ -55,16 +55,20 @@ public class ReservationService {
             LocalDate checkInDateFromReservation = LocalDate.parse(checkInFromReservation, formatter);
             LocalDate checkOutDateFromReservation = LocalDate.parse(checkOutFromReservation, formatter);
 
+            System.out.println("iterator reservation");
             System.out.println(reservation);
 
-            // 포함 관계 확인
-            if (!checkOutDate.isBefore(checkInDateFromReservation) &&
-                    !checkInDate.isAfter(checkOutDateFromReservation)) {
-                throw new HttpException(
-                        false,
-                        "예약이 불가능한 날짜입니다.",
-                        HttpStatus.BAD_REQUEST
-                );
+            // 삭제된 예약인지 확인
+            if(reservation.getDeletedAt() == null) {
+                // 포함 관계 확인
+                if (!checkOutDate.isBefore(checkInDateFromReservation) &&
+                        !checkInDate.isAfter(checkOutDateFromReservation)) {
+                    throw new HttpException(
+                            false,
+                            "예약이 불가능한 날짜입니다.",
+                            HttpStatus.BAD_REQUEST
+                    );
+                }
             }
         }
 

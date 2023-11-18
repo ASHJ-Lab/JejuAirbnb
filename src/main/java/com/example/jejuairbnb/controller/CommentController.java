@@ -60,14 +60,14 @@ public class CommentController {
 
     @GetMapping("/{id}")
     public FindCommentOneResponseDto findCommentOne (
-            @Parameter(description = "코멘트 id", required = true) Long id
+            @PathVariable(name = "id") @Parameter(description = "코멘트 id", required = true) Long id
     ){
         return commentService.findCommentOneById(id);
     }
 
     @PutMapping("/{id}")
     public CoreSuccessResponseWithData updateComment (
-            @PathVariable Long id,
+            @PathVariable(name = "id") Long id,
             @RequestBody UpdateCommentRequestDto requestDto
     ){
         return commentService.updateComment(
@@ -78,7 +78,7 @@ public class CommentController {
 
     @DeleteMapping("/{id}")
     public CoreSuccessResponse deleteComment (
-            @PathVariable Long id
+            @PathVariable(name = "id") Long id
     ){
         return commentService.deleteComment(id);
     }
