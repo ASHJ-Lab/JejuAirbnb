@@ -33,7 +33,7 @@ public class AdminProductController {
     @PutMapping("/{id}")
     public CoreSuccessResponse updateProduct(
             @CookieValue("access-token") String accessToken,
-            @PathVariable Long id,
+            @PathVariable(name = "id") Long id,
             @RequestBody UpdateProductRequestDto requestDto
     ) {
         User findUser = securityService.getSubject(accessToken);
@@ -47,7 +47,7 @@ public class AdminProductController {
     @DeleteMapping("/{id}")
     public CoreSuccessResponse deleteProduct(
             @CookieValue("access-token") String accessToken,
-            @PathVariable Long id
+            @PathVariable(name = "id")  Long id
     ) {
         User findUser = securityService.getSubject(accessToken);
         return adminProductService.deleteProduct(

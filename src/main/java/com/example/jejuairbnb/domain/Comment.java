@@ -30,6 +30,7 @@ public class Comment extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY) // LAZY 로딩으로 변경
     @ToString.Exclude
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -33,7 +33,7 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     public CoreSuccessResponse deleteReservation(
             @CookieValue("access-token") String accessToken,
-            @PathVariable Long id
+            @PathVariable(name = "id")  Long id
     ) {
         User foundUser = securityService.getSubject(accessToken);
         return reservationService.deleteReservation(
